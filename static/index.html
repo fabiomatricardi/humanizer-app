@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanizer</title>
+<link rel="stylesheet" href="style.css?v=20261103b">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="logo">H</span><span class="brand-name">Humanizer</span></div>
+  <div id="status-dot" class="status"><span class="dot"></span><span id="status-text">checking…</span></div>
+</header>
+
+<main>
+  <section class="hero">
+    <h1>Humanize AI text to <span class="grad">human-like</span></h1>
+    <p>Paste AI‑generated text, get a natural rewrite from your own model endpoint.</p>
+  </section>
+
+  <div class="app-card">
+    <div class="card-head">
+      <nav class="tabs">
+        <button id="tab-humanizer" class="tab active" type="button">Humanizer</button>
+        <button id="tab-config" class="tab" type="button">Configuration</button>
+      </nav>
+      <span class="card-hint">Ctrl+Enter to run</span>
+    </div>
+
+    <section id="view-humanizer" class="view">
+      <div class="pane left">
+        <div class="pane-head">
+          <span class="label">Original text</span>
+          <div class="tools">
+            <button id="btn-clear-src" class="btn btn-ghost" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="src-wrap">
+          <textarea id="src-text" placeholder="Paste AI-generated text…"></textarea>
+          <div id="scan-overlay" class="scan-overlay" aria-hidden="true"><div class="scanline"></div></div>
+          <div id="status-board" class="status-board" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="board-msg" class="board-msg">Working…</span>
+            <span id="board-timer" class="board-timer">0:00</span>
+          </div>
+        </div>
+        <div class="pane-foot">
+          <span id="src-count" class="wordcount">0 words</span>
+          <span id="phase-note" class="phase-note" hidden></span>
+          <div class="foot-actions">
+            <button id="btn-humanize" class="btn btn-primary" type="button">Humanize</button>
+            <button id="btn-stop" class="btn btn-danger" type="button" hidden>Stop</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="pane right">
+        <div class="pane-head">
+          <span class="label">Humanized text</span>
+          <div class="tools">
+            <button id="btn-copy" class="btn btn-ghost" type="button">Copy</button>
+            <button id="btn-download" class="btn btn-ghost" type="button">Download .txt</button>
+            <button id="btn-download-md" class="btn btn-ghost" type="button">Save .md</button>
+            <button id="btn-diff" class="btn btn-ghost" type="button" aria-pressed="false">Highlight changes</button>
+            <button id="btn-clear-out" class="btn btn-ghost" type="button">Clear</button>
+          </div>
+        </div>
+        <div class="out-wrap">
+          <div id="out-text" class="out" aria-live="polite"></div>
+          <div id="out-empty" class="out-empty">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M22 12h-6l-2 3h-4l-2-3H2"/>
+              <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>
+            </svg>
+            <span>Humanized text will appear here</span>
+          </div>
+        </div>
+        <div class="pane-foot" id="diff-foot" hidden>
+          <span id="diff-stats" class="chip"></span>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-config" class="view" hidden>
+      <div class="form-wrap">
+        <h2>Configuration</h2>
+        <p class="muted">Connect your OpenAI‑compatible endpoint.</p>
+        <form id="config-form">
+          <div class="form-row">
+            <label for="cfg-base-url">Base URL</label>
+            <input type="text" id="cfg-base-url" placeholder="https://api.openai.com/v1" autocomplete="off">
+          </div>
+          <div class="form-row">
+            <label for="cfg-api-key">API Key</label>
+            <div class="input-affix">
+              <input type="password" id="cfg-api-key" placeholder="sk-…" autocomplete="off">
+              <button type="button" class="eye" id="eye-toggle" aria-label="Show API key">👁</button>
+            </div>
+          </div>
+          <div class="form-row">
+            <label for="cfg-model">Model name</label>
+            <input type="text" id="cfg-model" placeholder="gpt-4o-mini" autocomplete="off">
+          </div>
+          <div class="form-grid">
+            <div class="form-row">
+              <label for="cfg-temp">Temperature</label>
+              <div class="range-row">
+                <input type="range" id="cfg-temp-range" min="0" max="2" step="0.1" value="0.7">
+                <input type="number" id="cfg-temp" min="0" max="2" step="0.1" value="0.7">
+              </div>
+            </div>
+            <div class="form-row">
+              <label for="cfg-max-tokens">Max tokens</label>
+              <input type="number" id="cfg-max-tokens" min="1" value="4000">
+            </div>
+          </div>
+          <div class="form-row">
+            <label class="check-label" for="cfg-no-reason">
+              <input type="checkbox" id="cfg-no-reason">
+              <span>Disable model reasoning
+                <em>Asks supported endpoints (OpenAI, DeepSeek, NVIDIA, vLLM) to skip the
+                thinking phase – faster replies, no reasoning tokens spent. Falls back
+                automatically if the endpoint rejects the parameter.</em>
+              </span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label class="check-label" for="cfg-verify-ssl">
+              <input type="checkbox" id="cfg-verify-ssl">
+              <span>Verify SSL certificates
+                <em>Turn off if calls fail with "CERTIFICATE_VERIFY_FAILED" – some VPNs
+                and corporate proxies intercept HTTPS with a private certificate that
+                strict verification rejects.</em>
+              </span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label for="cfg-intensity">Edit intensity</label>
+            <select id="cfg-intensity">
+              <option value="thorough">Thorough – rewrite every sentence with a tell</option>
+              <option value="light">Light – fix clear tells only, keep the voice</option>
+            </select>
+            <p class="hint">Thorough suits AI‑generated text. Use Light for text you wrote
+            yourself, so the rewrite does not flatten your voice.</p>
+          </div>
+          <div class="form-row">
+            <label class="check-label" for="cfg-multi-pass">
+              <input type="checkbox" id="cfg-multi-pass">
+              <span>Step-by-step rewriting (scan → rewrite → check → fix)
+                <em>The model first scans the text for AI tells, rewrites from that
+                list, then checks its own output and fixes what survived. Thorough
+                quality, about double the time and tokens. Light mode always runs
+                in a single pass.</em>
+              </span>
+            </label>
+          </div>
+          <div class="form-row">
+            <label for="cfg-sample">Writing sample (optional)</label>
+            <textarea id="cfg-sample" rows="4" placeholder="Paste your own writing for voice matching…"></textarea>
+          </div>
+          <div class="form-actions">
+            <button type="submit" id="btn-save-config" class="btn btn-primary">Save</button>
+            <button type="button" id="btn-test" class="btn btn-ghost">Test connection</button>
+            <span id="test-result" class="muted"></span>
+          </div>
+        </form>
+        <p class="muted small footnote">Settings are saved to <code>config.json</code> in this folder.
+        The API key is stored as‑is (plaintext).</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div id="toast" class="toast" hidden><span id="toast-msg"></span></div>
+
+<script src="env.js"></script>
+<script src="diff.js?v=20261103a"></script>
+<script src="app.js?v=20261103e"></script>
+</body>
+</html>

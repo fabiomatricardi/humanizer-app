@@ -1,0 +1,10 @@
+# local runtime artifacts
+.venv/
+__pycache__/
+*.py[cod]
+
+# local configuration (contains your API key in plaintext)
+config.json
+
+# scratch notes
+WIP.md

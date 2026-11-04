@@ -1,0 +1,12 @@
+{
+  "base_url": "https://integrate.api.nvidia.com/v1",
+  "api_key": "",
+  "model_name": "deepseek-ai/deepseek-v4.1-flash",
+  "temperature": 0.7,
+  "max_tokens": 4000,
+  "writing_sample": "",
+  "disable_reasoning": false,
+  "edit_intensity": "thorough",
+  "verify_ssl": true,
+  "multi_pass": true
+}

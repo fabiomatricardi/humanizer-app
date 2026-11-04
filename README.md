@@ -4,7 +4,7 @@ A local web application that rewrites AI-sounding text into natural human prose,
 
 No third-party dependencies. Runs on Python only.
 
-![](asset/humanize.gif)
+<img src="https://github.com/fabiomatricardi/humanizer-app/raw/main/asset/humanize.gif" width=900>
 
 ## Features
 

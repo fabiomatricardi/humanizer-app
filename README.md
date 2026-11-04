@@ -4,6 +4,8 @@ A local web application that rewrites AI-sounding text into natural human prose,
 
 No third-party dependencies. Runs on Python only.
 
+![](asset/humanize.gif)
+
 ## Features
 
 - **Multi-pass humanization** – Scan → Rewrite → Check → Fix. The model first lists the AI tells it finds, rewrites from that list, then checks its own output; a **deterministic code check** also feeds back paragraphs copied word-for-word, so visible rewriting happens even on small models.
